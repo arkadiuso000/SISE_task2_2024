@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.optimizers import Adam, SGD
 import matplotlib.pyplot as plt
 
@@ -37,3 +37,25 @@ def load_data():
                 testing_data = pd.concat([testing_data, temp_data_frame], ignore_index=True)
 
     return training_data, testing_data
+
+def create_model(num_of_inputs_neurons, hidden_layers, num_of_outputs_neurons=2, activation_function='tanh', weight_init_method='glorot_uniform'):
+    # sequential model allows creating model layer by layer
+    model = Sequential()
+
+    # input layer
+    il = Input(shape=(num_of_inputs_neurons,))
+    model.add(il)
+
+    # first hidden layer
+    fhl = Dense(hidden_layers[0], activation=activation_function, kernel_initializer=weight_init_method)
+    model.add(fhl)
+
+    for layer in hidden_layers[1:]:
+        # next hidden layer
+        nhl = Dense(layer, activation=activation_function, kernel_initializer=weight_init_method)
+        model.add(nhl)
+
+    # output layer
+    ol = Dense(num_of_outputs_neurons, kernel_initializer=weight_init_method)
+    model.add(ol)
+    return model

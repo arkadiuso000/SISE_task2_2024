@@ -59,3 +59,19 @@ def create_model(num_of_inputs_neurons, hidden_layers, num_of_outputs_neurons=2,
     ol = Dense(num_of_outputs_neurons, kernel_initializer=weight_init_method)
     model.add(ol)
     return model
+
+def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer='adam'):
+    train_data = training_data[["intup_X", "intup_Y"]]
+    test_data = training_data[["excpected_X", "excpected_Y"]]
+
+    if optimizer == 'adam':
+        opt = Adam(learning_rate=learning_rate)
+    elif optimizer == 'sgd':
+        opt = SGD(learning_rate=learning_rate)
+    else:
+        raise ValueError('Optimizer must be either "adam" or "sgd"')
+
+    model.compile(optimizer=opt, loss="mean_squared_error", metrics=['mse'])
+
+    history = model.fit(train_data, test_data, epochs=epochs, validation_split=0.2, verbose=0)
+    return history

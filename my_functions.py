@@ -75,3 +75,11 @@ def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer=
 
     history = model.fit(train_data, test_data, epochs=epochs, validation_split=0.2, verbose=0)
     return history
+
+def test_model(model, test_data):
+    input_values = test_data["intup_X","intup_Y"].values
+    validation_values = test_data["excpected_X","excpected_Y"].values
+
+    mse = model.evaulation(input_values, validation_values, verbose=0)
+    print("MSE on test data: {}".format(mse[1]))
+    return mse[1]

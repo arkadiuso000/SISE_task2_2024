@@ -35,10 +35,10 @@ def load_data():
                 file_path = os.path.join(dynamic_folder_path, file)
                 temp_data_frame = pd.read_csv(file_path, names=columns)
                 testing_data = pd.concat([testing_data, temp_data_frame], ignore_index=True)
-
+    print("Data loaded ✅")
     return training_data, testing_data
 
-def create_model(hidden_layers, num_of_inputs_neurons=2, num_of_outputs_neurons=2, activation_function='tanh', weight_init_method='glorot_uniform'):
+def create_model(hidden_layers, activation_function='tanh', weight_init_method='glorot_uniform',num_of_inputs_neurons=2, num_of_outputs_neurons=2):
     # sequential model allows creating model layer by layer
     model = Sequential()
 
@@ -58,6 +58,7 @@ def create_model(hidden_layers, num_of_inputs_neurons=2, num_of_outputs_neurons=
     # output layer
     ol = Dense(num_of_outputs_neurons, kernel_initializer=weight_init_method)
     model.add(ol)
+    print("model created ✅")
     return model
 
 def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer='adam'):
@@ -74,6 +75,7 @@ def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer=
     model.compile(optimizer=opt, loss="mean_squared_error", metrics=['mse'])
 
     history = model.fit(train_data, test_data, epochs=epochs, validation_split=0.2, verbose=0)
+    print("model trained ✅")
     return history
 
 def test_model(model, test_data):

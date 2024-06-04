@@ -38,7 +38,7 @@ def load_data():
 
     return training_data, testing_data
 
-def create_model(num_of_inputs_neurons, hidden_layers, num_of_outputs_neurons=2, activation_function='tanh', weight_init_method='glorot_uniform'):
+def create_model(hidden_layers, num_of_inputs_neurons=2, num_of_outputs_neurons=2, activation_function='tanh', weight_init_method='glorot_uniform'):
     # sequential model allows creating model layer by layer
     model = Sequential()
 
@@ -83,3 +83,4 @@ def test_model(model, test_data):
     mse = model.evaulation(input_values, validation_values, verbose=0)
     print("MSE on test data: {}".format(mse[1]))
     return mse[1]
+

@@ -80,7 +80,7 @@ def test_model(model, test_data):
     input_values = test_data["intup_X","intup_Y"].values
     validation_values = test_data["excpected_X","excpected_Y"].values
 
-    mse = model.evaulation(input_values, validation_values, verbose=0)
+    mse = model.evaluate(input_values, validation_values, verbose=0)
     print("MSE on test data: {}".format(mse[1]))
     return mse[1]
 

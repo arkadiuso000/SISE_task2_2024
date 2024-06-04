@@ -84,3 +84,10 @@ def test_model(model, test_data):
     print("MSE on test data: {}".format(mse[1]))
     return mse[1]
 
+def plot(history):
+    plt.plot(history.history['mse'], label='MSE na zbiorze uczącym')
+    plt.plot(history.history['val_mse'], label='MSE na zbiorze walidacyjnym')
+    plt.xlabel('Epoki')
+    plt.ylabel('MSE')
+    plt.legend()
+    plt.show()

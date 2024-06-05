@@ -38,7 +38,7 @@ def load_data():
     print("Data loaded ✅")
     return training_data, testing_data
 
-def create_model(hidden_layers, activation_function='tanh', weight_init_method='glorot_uniform',num_of_inputs_neurons=2, num_of_outputs_neurons=2):
+def create_model(hidden_layers, activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform',num_of_inputs_neurons=2, num_of_outputs_neurons=2):
     # sequential model allows creating model layer by layer
     model = Sequential()
 
@@ -56,33 +56,33 @@ def create_model(hidden_layers, activation_function='tanh', weight_init_method='
         model.add(nhl)
 
     # output layer
-    ol = Dense(num_of_outputs_neurons, kernel_initializer=weight_init_method)
+    ol = Dense(num_of_outputs_neurons, kernel_initializer=weight_init_method, activation=activation_function_out)
     model.add(ol)
     print("model created ✅")
     return model
 
-def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer='adam'):
+def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer='adam', moementum=0.9):
     train_data = training_data[["intup_X", "intup_Y"]]
     test_data = training_data[["excpected_X", "excpected_Y"]]
 
     if optimizer == 'adam':
         opt = Adam(learning_rate=learning_rate)
     elif optimizer == 'sgd':
-        opt = SGD(learning_rate=learning_rate)
+        opt = SGD(learning_rate=learning_rate, momentum=moementum)
     else:
         raise ValueError('Optimizer must be either "adam" or "sgd"')
 
     model.compile(optimizer=opt, loss="mean_squared_error", metrics=['mse'])
 
-    history = model.fit(train_data, test_data, epochs=epochs, validation_split=0.2, verbose=0)
-    print("model trained ✅")
+    history = model.fit(train_data, test_data, epochs=epochs, validation_split=0.0, verbose=2)
+    print("\tmodel trained ✅")
     return history
 
 def test_model(model, test_data):
     input_values = test_data["intup_X","intup_Y"].values
     validation_values = test_data["excpected_X","excpected_Y"].values
 
-    mse = model.evaluate(input_values, validation_values, verbose=0)
+    mse = model.evaluate(input_values, validation_values, verbose=2)
     print("MSE on test data: {}".format(mse[1]))
     return mse[1]
 

@@ -14,3 +14,4 @@ print(f"MSE on test data: {mse}")
 
 # Wizualizacja wyników
 model.plot(history)
+plot_cdf([model], testing_data)

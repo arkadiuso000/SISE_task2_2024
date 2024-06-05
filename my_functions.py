@@ -113,8 +113,9 @@ class NeuralNetworkModel:
 
         # final evaluation of the model
         mse = self.model.evaluate(test_data, test_labels, verbose=0)
+        predictions = self.model.predict(test_data)
         print("MSE on test data: {}".format(mse[1]))
-        return mse[1]
+        return mse[1], predictions
 
     def plot(self, history):
         plt.plot(history.history['mse'], label='MSE na zbiorze uczącym')
@@ -123,3 +124,42 @@ class NeuralNetworkModel:
         plt.ylabel('MSE')
         plt.legend()
         plt.show()
+
+    def give_train_mse(self, history):
+        # static data
+        return history.history['mse']
+    def give_test_mse(self, history):
+        # dynamic data
+        return history.history['val_mse']
+
+
+# plot 3
+def calculate_cdf(errors):
+    sorted_errors = np.sort(errors)
+    cdf = np.cumsum(sorted_errors) / np.sum(sorted_errors)
+    return sorted_errors, cdf
+def plot_cdf(models, testing_data):
+    plt.figure(figsize=(10, 6))
+    counter = 1
+    for model in models:
+        mse, predictions = model.test(testing_data)
+        errors = np.abs(testing_data[["expected_X", "expected_Y"]].values - predictions)
+        errors = errors.flatten()
+
+        sorted_errors, cdf = calculate_cdf(errors)
+        plt.plot(sorted_errors, cdf, label='Model: {}'.format(counter))
+        plt.grid(True)
+        counter += 1
+
+    # distribution of errors for real dynamic measurements
+    real_errors = np.abs(
+        testing_data[["expected_X", "expected_Y"]].values - testing_data[["input_X", "input_Y"]].values)
+    real_errors = real_errors.flatten()
+    sorted_real_errors, real_cdf = calculate_cdf(real_errors)
+    plt.plot(sorted_real_errors, real_cdf, label='wszystkie pomiary dynamiczne', linestyle='--')
+
+    plt.xlabel('Błąd')
+    plt.ylabel('Skumulowane prawdopodobieństwo')
+    plt.title('Dystrybuanta blędów pomiarów dynamicznych dla wybranych wariantów sieci')
+    plt.legend()
+    plt.show()

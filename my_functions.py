@@ -42,63 +42,84 @@ def load_data():
     training_data.to_csv("training_data.csv", index=False)
     testing_data.to_csv("testing_data.csv", index=False)
 
-    print("Data loaded and saved to CSV ✅")
+    print("Data loaded ✅")
     return training_data, testing_data
 
 
-def create_model(hidden_layers, activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform',num_of_inputs_neurons=2, num_of_outputs_neurons=2):
-    # sequential model allows creating model layer by layer
-    model = Sequential()
+class NeuralNetworkModel:
+    def __init__(self, hidden_layers, activation_function='tanh', activation_function_out='linear',
+                 weight_init_method='glorot_uniform', num_of_inputs_neurons=2, num_of_outputs_neurons=2,
+                 epochs=100, learning_rate=0.01, optimizer='adam', momentum=0.9):
+        self.hidden_layers = hidden_layers
+        self.activation_function = activation_function
+        self.activation_function_out = activation_function_out
+        self.weight_init_method = weight_init_method
+        self.num_of_inputs_neurons = num_of_inputs_neurons
+        self.num_of_outputs_neurons = num_of_outputs_neurons
+        self.epochs = epochs
+        self.learning_rate = learning_rate
+        self.optimizer_type = optimizer
+        self.momentum = momentum
+        self.model = self.create_model()
 
-    # input layer
-    il = Input(shape=(num_of_inputs_neurons,))
-    model.add(il)
+    def create_model(self):
+        model = Sequential()
 
-    # first hidden layer
-    fhl = Dense(hidden_layers[0], activation=activation_function, kernel_initializer=weight_init_method)
-    model.add(fhl)
+        # input layer
+        il = Input(shape=(self.num_of_inputs_neurons,))
+        model.add(il)
 
-    for layer in hidden_layers[1:]:
-        # next hidden layer
-        nhl = Dense(layer, activation=activation_function, kernel_initializer=weight_init_method)
-        model.add(nhl)
+        # first hidden layer
+        fhl = Dense(self.hidden_layers[0], activation=self.activation_function, kernel_initializer=self.weight_init_method)
+        model.add(fhl)
 
-    # output layer
-    ol = Dense(num_of_outputs_neurons, kernel_initializer=weight_init_method, activation=activation_function_out)
-    model.add(ol)
-    print("Model created ✅")
-    return model
+        for layer in self.hidden_layers[1:]:
+            # next hidden layer
+            nhl = Dense(layer, activation=self.activation_function, kernel_initializer=self.weight_init_method)
+            model.add(nhl)
 
-def train_model(model, training_data, epochs=100, learning_rate=0.01, optimizer='adam', moementum=0.9):
-    train_data = training_data[["input_X", "input_Y"]]
-    test_data = training_data[["expected_X", "expected_Y"]]
+        # output layer
+        ol = Dense(self.num_of_outputs_neurons, kernel_initializer=self.weight_init_method, activation=self.activation_function_out)
+        model.add(ol)
+        print("Model created ✅")
+        return model
 
-    if optimizer == 'adam':
-        opt = Adam(learning_rate=learning_rate)
-    elif optimizer == 'sgd':
-        opt = SGD(learning_rate=learning_rate, momentum=moementum)
-    else:
-        raise ValueError('Optimizer must be either "adam" or "sgd"')
+    def train(self, training_data, testing_data):
+        # preparation of training and validation data
+        train_data = training_data[["input_X", "input_Y"]].values
+        train_labels = training_data[["expected_X", "expected_Y"]].values
+        val_data = testing_data[["input_X", "input_Y"]].values
+        val_labels = testing_data[["expected_X", "expected_Y"]].values
 
-    model.compile(optimizer=opt, loss="mean_squared_error", metrics=['mse'])
+        # optimizer selection
+        if self.optimizer_type == 'adam':
+            opt = Adam(learning_rate=self.learning_rate)
+        elif self.optimizer_type == 'sgd':
+            opt = SGD(learning_rate=self.learning_rate, momentum=self.momentum)
+        else:
+            raise ValueError('Optimizer must be either "adam" or "sgd"')
 
-    history = model.fit(train_data, test_data, epochs=epochs, validation_split=0.0, verbose=0)
-    print("\tModel trained ✅")
-    return history
+        # model compilation
+        self.model.compile(optimizer=opt, loss="mean_squared_error", metrics=['mse'])
 
-def test_model(model, test_data):
-    input_values = test_data[["input_X", "input_Y"]]
-    validation_values = test_data[["expected_X", "expected_Y"]]
+        history = self.model.fit(train_data, train_labels, epochs=self.epochs, validation_data=(val_data, val_labels), verbose=0)
+        print("\tModel trained ✅")
+        return history
 
-    mse = model.evaluate(input_values, validation_values, verbose=1)
+    def test(self, testing_data):
+        # preparation of validation data
+        test_data = testing_data[["input_X", "input_Y"]].values
+        test_labels = testing_data[["expected_X", "expected_Y"]].values
 
-    print("MSE on test data: {}".format(mse[1]))
-    return mse[1]
+        # final evaluation of the model
+        mse = self.model.evaluate(test_data, test_labels, verbose=0)
+        print("MSE on test data: {}".format(mse[1]))
+        return mse[1]
 
-def plot(history):
-    plt.plot(history.history['mse'], label='MSE na zbiorze uczącym')
-    # plt.plot(history.history['val_mse'], label='MSE na zbiorze walidacyjnym')
-    plt.xlabel('Epoki')
-    plt.ylabel('MSE')
-    plt.legend()
-    plt.show()
+    def plot(self, history):
+        plt.plot(history.history['mse'], label='MSE na zbiorze uczącym')
+        plt.plot(history.history['val_mse'], label='MSE na zbiorze walidacyjnym')
+        plt.xlabel('Epoki')
+        plt.ylabel('MSE')
+        plt.legend()
+        plt.show()

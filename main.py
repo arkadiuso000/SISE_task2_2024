@@ -1,29 +1,16 @@
-import my_functions as mf
+from my_functions import *
 
-training_data, testing_data = mf.load_data()
-print(training_data.isna().sum())
-print(testing_data.isna().sum())
+training_data, testing_data = load_data()
 
-# models with 1 hidden layer
-h1_v1 = mf.create_model([1],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
-# h1_v2 = mf.create_model([1],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
-# h1_v3 = mf.create_model([1],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
+# Tworzenie instancji modelu
+model = NeuralNetworkModel(hidden_layers=[1], epochs=30, learning_rate=0.01, optimizer='adam', momentum=0.9)
 
-# models with 2 hidden layer
-# h2_v1 = mf.create_model([2,2],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
-# h2_v2 = mf.create_model([2,2],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
-# h2_v3 = mf.create_model([2,2],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
+# Trenowanie modelu
+history = model.train(training_data, testing_data)
 
-# models with 3 hidden layer
-# h3_v1 = mf.create_model([3,3,3],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
-# h3_v2 = mf.create_model([3,3,3],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
-# h3_v3 = mf.create_model([3,3,3],activation_function='tanh', activation_function_out='linear', weight_init_method='glorot_uniform')
+# Testowanie modelu
+mse = model.test(testing_data)
+print(f"MSE on test data: {mse}")
 
-
-# training models with 1 hidden layer
-h1 = mf.train_model(h1_v1,training_data, epochs=30)
-t1 = mf.test_model(h1_v1,testing_data)
-print(t1)
-mf.plot(h1)
-# training models with 2 hidden layer
-# training models with 3 hidden layer
+# Wizualizacja wyników
+model.plot(history)

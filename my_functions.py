@@ -132,13 +132,40 @@ class NeuralNetworkModel:
         # dynamic data
         return history.history['val_mse']
 
+# plot 1
+def plot_1(histories):
+    plt.figure(figsize=(10, 6))
+    counter = 1
+    for history in histories:
+        plt.plot(history.history['val_mse'], label='model {}'.format(counter))
+        counter += 1
 
+    plt.xlabel('Epoki')
+    plt.ylabel('MSE')
+    plt.grid(True)
+    plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym')
+    plt.legend()
+    plt.show()
+# plot 2
+def plot_2(histories):
+    plt.figure(figsize=(10, 6))
+    counter = 1
+    for history in histories:
+        plt.plot(history.history['mse'], label='model {}'.format(counter))
+        counter += 1
+
+    plt.xlabel('Epoki')
+    plt.ylabel('MSE')
+    plt.grid(True)
+    plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym')
+    plt.legend()
+    plt.show()
 # plot 3
 def calculate_cdf(errors):
     sorted_errors = np.sort(errors)
     cdf = np.cumsum(sorted_errors) / np.sum(sorted_errors)
     return sorted_errors, cdf
-def plot_cdf(models, testing_data):
+def plot_3(models, testing_data):
     plt.figure(figsize=(10, 6))
     counter = 1
     for model in models:
@@ -147,7 +174,7 @@ def plot_cdf(models, testing_data):
         errors = errors.flatten()
 
         sorted_errors, cdf = calculate_cdf(errors)
-        plt.plot(sorted_errors, cdf, label='Model: {}'.format(counter))
+        plt.plot(sorted_errors, cdf, label='model {}'.format(counter))
         plt.grid(True)
         counter += 1
 

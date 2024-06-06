@@ -10,8 +10,9 @@ history = model.train(training_data, testing_data)
 
 # Testowanie modelu
 mse = model.test(testing_data)
-print(f"MSE on test data: {mse}")
+# print(f"MSE on test data: {mse}")
 
 # Wizualizacja wyników
-model.plot(history)
-plot_3([model], testing_data)
+# model.plot(history)
+# plot_3([model], testing_data)
+plot_4([model], testing_data)

@@ -49,7 +49,7 @@ def load_data():
 class NeuralNetworkModel:
     def __init__(self, hidden_layers, activation_function='tanh', activation_function_out='linear',
                  weight_init_method='glorot_uniform', num_of_inputs_neurons=2, num_of_outputs_neurons=2,
-                 epochs=100, learning_rate=0.01, optimizer='adam', momentum=0.9):
+                 epochs=100, learning_rate=0.01, optimizer='adam', momentum=0.9, id=0):
         self.hidden_layers = hidden_layers
         self.activation_function = activation_function
         self.activation_function_out = activation_function_out
@@ -61,6 +61,7 @@ class NeuralNetworkModel:
         self.optimizer_type = optimizer
         self.momentum = momentum
         self.model = self.create_model()
+        self.id = id
 
     def create_model(self):
         model = Sequential()
@@ -113,7 +114,8 @@ class NeuralNetworkModel:
 
         # final evaluation of the model
         mse = self.model.evaluate(test_data, test_labels, verbose=0)
-        predictions = self.model.predict(test_data)
+        predictions = self.model.predict(test_data, verbose=0)
+        # print(predictions)
         print("MSE on test data: {}".format(mse[1]))
         return mse[1], predictions
 
@@ -131,6 +133,8 @@ class NeuralNetworkModel:
     def give_test_mse(self, history):
         # dynamic data
         return history.history['val_mse']
+    def get_id(self):
+        return self.id
 
 # plot 1
 def plot_1(histories):
@@ -185,8 +189,52 @@ def plot_3(models, testing_data):
     sorted_real_errors, real_cdf = calculate_cdf(real_errors)
     plt.plot(sorted_real_errors, real_cdf, label='wszystkie pomiary dynamiczne', linestyle='--')
 
-    plt.xlabel('Błąd')
-    plt.ylabel('Skumulowane prawdopodobieństwo')
+    plt.xlabel('Błąd [mm]')
+    plt.ylabel('Prawdopodobieństwo')
     plt.title('Dystrybuanta blędów pomiarów dynamicznych dla wybranych wariantów sieci')
     plt.legend()
+    plt.show()
+
+# plot 4
+def plot_4(models, testing_data):
+    plt.figure(figsize=(10, 6))
+
+    best_model = None
+    best_mse = float('inf')
+    best_predictions = None
+
+    for model in models:
+        mse, predictions = model.test(testing_data)
+        if mse < best_mse:
+            best_mse = mse
+            best_model = model
+            best_predictions = predictions
+
+    # real values
+    real_x = testing_data["expected_X"].values
+    real_y = testing_data["expected_Y"].values
+
+    # corrected values
+    corrected_x = []
+    corrected_y = []
+    for val in best_predictions:
+        corrected_x.append(val[0])
+        corrected_y.append(val[1])
+
+
+    # measured values
+    measured_x = testing_data["input_X"].values
+    measured_y = testing_data["input_Y"].values
+
+    plt.scatter(measured_x, measured_y, label='zmierzone wartości', color='blue', alpha=0.1)
+    plt.scatter(corrected_x, corrected_y, label='poprawione wartości', color='green', alpha=1.0)
+    plt.scatter(real_x, real_y, label='wartości rzeczywiste', color='red', alpha=0.7)
+
+
+
+    plt.xlabel('x [mm]')
+    plt.ylabel('y [mm]')
+    plt.title('Wykres wyników pomiarów dynamicznych dla wariantu o największej skuteczności')
+    plt.legend()
+    print(model.get_id())
     plt.show()

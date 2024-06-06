@@ -117,10 +117,10 @@ class NeuralNetworkModel:
         mse = self.model.evaluate(test_data, test_labels, verbose=0)
         predictions = self.model.predict(test_data, verbose=0)
         # Print input values and corresponding predictions
-        for i in range(len(test_data)):
-            print(f"Input: {test_data[i]} -> Predicted: {predictions[i]}")
+        # for i in range(len(test_data)):
+        #     print(f"Input: {test_data[i]} -> Predicted: {predictions[i]}")
 
-        print("MSE on test data: {}".format(mse[1]))
+        # print("MSE on test data: {}".format(mse[1]))
         return mse[1], predictions
 
     def give_train_mse(self, history):
@@ -135,27 +135,36 @@ class NeuralNetworkModel:
 # plot 1
 def plot_1(histories):
     plt.figure(figsize=(10, 6))
+    counter = 1
     for history in histories:
-        plt.plot(history.history['val_mse'], label='model {}'.format(model.get_id()))
+        plt.plot(history.history['val_mse'], label='l. warstw: {}'.format(counter))
+        counter += 1
 
     plt.xlabel('Numer epoki')
     plt.ylabel('Błąd średniokwadratowy')
-    plt.grid(True)
+    plt.yscale('log')  # Ustawienie skali logarytmicznej na osi Y
+    plt.grid(True, which='both', linestyle='--')
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym')
     plt.legend()
     plt.show()
-# plot 2
+
+
 def plot_2(histories, testing_data):
     input_data = testing_data[["input_X", "input_Y"]].values
     expected_data = testing_data[["expected_X", "expected_Y"]].values
     test_mse = mean_squared_error(expected_data, input_data)
+
     plt.figure(figsize=(10, 6))
+    counter = 1
     for history in histories:
-        plt.plot(history.history['mse'], label='model {}'.format(model.get_id()))
+        plt.plot(history.history['mse'], label='l. warstw: {}'.format(counter))
+        counter += 1
+
     plt.axhline(y=test_mse, color='b', linestyle='--', label='blad zbioru testowego')
     plt.xlabel('Numer epoki')
     plt.ylabel('Błąd średniokwadratowy')
-    plt.grid(True)
+    plt.yscale('log')  # Ustawienie skali logarytmicznej na osi Y
+    plt.grid(True, which='both', linestyle='--')
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym')
     plt.legend()
     plt.show()
@@ -166,13 +175,15 @@ def calculate_cdf(errors):
     return sorted_errors, cdf
 def plot_3(models, testing_data):
     plt.figure(figsize=(10, 6))
+    counter = 1
     for model in models:
         mse, predictions = model.test(testing_data)
         errors = np.abs(testing_data[["expected_X", "expected_Y"]].values - predictions)
         errors = errors.flatten()
 
         sorted_errors, cdf = calculate_cdf(errors)
-        plt.plot(sorted_errors, cdf, label='model {}'.format(model.get_id))
+        plt.plot(sorted_errors, cdf, label='l. warstw: {}'.format(counter))
+        counter += 1
         plt.grid(True)
 
     # distribution of errors for real dynamic measurements
@@ -219,7 +230,7 @@ def plot_4(models, testing_data):
     measured_x = testing_data["input_X"].values
     measured_y = testing_data["input_Y"].values
 
-    plt.scatter(measured_x, measured_y, label='zmierzone wartości', color='blue', alpha=0.1)
+    plt.scatter(measured_x, measured_y, label='zmierzone wartości', color='blue', alpha=0.5)
     plt.scatter(corrected_x, corrected_y, label='poprawione wartości', color='green', alpha=1.0)
     plt.scatter(real_x, real_y, label='wartości rzeczywiste', color='red', alpha=0.7)
 

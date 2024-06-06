@@ -6,6 +6,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.optimizers import Adam, SGD
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
 
 
 def load_data():
@@ -115,17 +116,12 @@ class NeuralNetworkModel:
         # final evaluation of the model
         mse = self.model.evaluate(test_data, test_labels, verbose=0)
         predictions = self.model.predict(test_data, verbose=0)
-        # print(predictions)
+        # Print input values and corresponding predictions
+        for i in range(len(test_data)):
+            print(f"Input: {test_data[i]} -> Predicted: {predictions[i]}")
+
         print("MSE on test data: {}".format(mse[1]))
         return mse[1], predictions
-
-    def plot(self, history):
-        plt.plot(history.history['mse'], label='MSE na zbiorze uczącym')
-        plt.plot(history.history['val_mse'], label='MSE na zbiorze walidacyjnym')
-        plt.xlabel('Epoki')
-        plt.ylabel('MSE')
-        plt.legend()
-        plt.show()
 
     def give_train_mse(self, history):
         # static data
@@ -139,27 +135,26 @@ class NeuralNetworkModel:
 # plot 1
 def plot_1(histories):
     plt.figure(figsize=(10, 6))
-    counter = 1
     for history in histories:
-        plt.plot(history.history['val_mse'], label='model {}'.format(counter))
-        counter += 1
+        plt.plot(history.history['val_mse'], label='model {}'.format(model.get_id()))
 
-    plt.xlabel('Epoki')
-    plt.ylabel('MSE')
+    plt.xlabel('Numer epoki')
+    plt.ylabel('Błąd średniokwadratowy')
     plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym')
     plt.legend()
     plt.show()
 # plot 2
-def plot_2(histories):
+def plot_2(histories, testing_data):
+    input_data = testing_data[["input_X", "input_Y"]].values
+    expected_data = testing_data[["expected_X", "expected_Y"]].values
+    test_mse = mean_squared_error(expected_data, input_data)
     plt.figure(figsize=(10, 6))
-    counter = 1
     for history in histories:
-        plt.plot(history.history['mse'], label='model {}'.format(counter))
-        counter += 1
-
-    plt.xlabel('Epoki')
-    plt.ylabel('MSE')
+        plt.plot(history.history['mse'], label='model {}'.format(model.get_id()))
+    plt.axhline(y=test_mse, color='b', linestyle='--', label='blad zbioru testowego')
+    plt.xlabel('Numer epoki')
+    plt.ylabel('Błąd średniokwadratowy')
     plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym')
     plt.legend()
@@ -167,27 +162,25 @@ def plot_2(histories):
 # plot 3
 def calculate_cdf(errors):
     sorted_errors = np.sort(errors)
-    cdf = np.cumsum(sorted_errors) / np.sum(sorted_errors)
+    cdf = np.arange(1, len(sorted_errors) + 1) / len(sorted_errors)
     return sorted_errors, cdf
 def plot_3(models, testing_data):
     plt.figure(figsize=(10, 6))
-    counter = 1
     for model in models:
         mse, predictions = model.test(testing_data)
         errors = np.abs(testing_data[["expected_X", "expected_Y"]].values - predictions)
         errors = errors.flatten()
 
         sorted_errors, cdf = calculate_cdf(errors)
-        plt.plot(sorted_errors, cdf, label='model {}'.format(counter))
+        plt.plot(sorted_errors, cdf, label='model {}'.format(model.get_id))
         plt.grid(True)
-        counter += 1
 
     # distribution of errors for real dynamic measurements
     real_errors = np.abs(
         testing_data[["expected_X", "expected_Y"]].values - testing_data[["input_X", "input_Y"]].values)
     real_errors = real_errors.flatten()
     sorted_real_errors, real_cdf = calculate_cdf(real_errors)
-    plt.plot(sorted_real_errors, real_cdf, label='wszystkie pomiary dynamiczne', linestyle='--')
+    plt.plot(sorted_real_errors, real_cdf, label='dystrybuanta pomiarów dynamicznych', linestyle='--')
 
     plt.xlabel('Błąd [mm]')
     plt.ylabel('Prawdopodobieństwo')
@@ -238,3 +231,4 @@ def plot_4(models, testing_data):
     plt.legend()
     print(model.get_id())
     plt.show()
+

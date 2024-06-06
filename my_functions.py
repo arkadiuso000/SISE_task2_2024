@@ -158,6 +158,7 @@ def plot_1(histories):
     plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym', fontsize=16)
     plt.legend(fontsize=12)
+    plt.yscale('log')
     plt.show()
 
 def plot_2(histories, testing_data):
@@ -175,6 +176,7 @@ def plot_2(histories, testing_data):
     plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym', fontsize=16)
     plt.legend(fontsize=12)
+    plt.yscale('log')
     plt.show()
 
 def calculate_cdf(errors):

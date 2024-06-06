@@ -181,7 +181,7 @@ def plot_2(histories, testing_data):
 
 def calculate_cdf(errors):
     sorted_errors = np.sort(errors)
-    cdf = np.arange(1, len(sorted_errors) + 1) / len(sorted_errors)
+    cdf = np.arange(len(sorted_errors)) / len(sorted_errors)
     return sorted_errors, cdf
 
 def plot_3(models, testing_data):

@@ -155,7 +155,7 @@ def plot_1(histories):
 
     plt.xlabel('Numer epoki')
     plt.ylabel('Błąd średniokwadratowy')
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym')
     plt.legend()
@@ -173,7 +173,7 @@ def plot_2(histories, testing_data):
     plt.axhline(y=test_mse, color='b', linestyle='--', label='blad zbioru testowego')
     plt.xlabel('Numer epoki')
     plt.ylabel('Błąd średniokwadratowy')
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym')
     plt.legend()

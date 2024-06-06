@@ -132,6 +132,19 @@ class NeuralNetworkModel:
     def get_id(self):
         return self.id
 
+    def save_initial_weights(self, filename="initial_weights.csv"):
+        weights = []
+        for layer in self.model.layers:
+            layer_weights = layer.get_weights()
+            if layer_weights:  # Check if layer has weights
+                weights.append(layer_weights[0].flatten())  # Save only the kernel weights (not biases)
+
+        weights = [w for sublist in weights for w in sublist]  # Flatten list of lists
+        weights_df = pd.DataFrame(weights, columns=["weight"])
+        weights_df.to_csv(filename, index=False)
+        print(f"Initial weights saved to {filename}")
+
+
 # plot 1
 def plot_1(histories):
     plt.figure(figsize=(10, 6))
@@ -142,29 +155,26 @@ def plot_1(histories):
 
     plt.xlabel('Numer epoki')
     plt.ylabel('Błąd średniokwadratowy')
-    plt.yscale('log')  # Ustawienie skali logarytmicznej na osi Y
-    plt.grid(True, which='both', linestyle='--')
+    plt.yscale('log')
+    plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym')
     plt.legend()
     plt.show()
-
 
 def plot_2(histories, testing_data):
     input_data = testing_data[["input_X", "input_Y"]].values
     expected_data = testing_data[["expected_X", "expected_Y"]].values
     test_mse = mean_squared_error(expected_data, input_data)
-
     plt.figure(figsize=(10, 6))
     counter = 1
     for history in histories:
         plt.plot(history.history['mse'], label='l. warstw: {}'.format(counter))
         counter += 1
-
     plt.axhline(y=test_mse, color='b', linestyle='--', label='blad zbioru testowego')
     plt.xlabel('Numer epoki')
     plt.ylabel('Błąd średniokwadratowy')
-    plt.yscale('log')  # Ustawienie skali logarytmicznej na osi Y
-    plt.grid(True, which='both', linestyle='--')
+    plt.yscale('log')
+    plt.grid(True)
     plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym')
     plt.legend()
     plt.show()
@@ -242,4 +252,5 @@ def plot_4(models, testing_data):
     plt.legend()
     print(model.get_id())
     plt.show()
+
 

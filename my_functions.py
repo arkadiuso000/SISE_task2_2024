@@ -153,12 +153,11 @@ def plot_1(histories):
         plt.plot(history.history['val_mse'], label='l. warstw: {}'.format(counter))
         counter += 1
 
-    plt.xlabel('Numer epoki')
-    plt.ylabel('Błąd średniokwadratowy')
-    # plt.yscale('log')
+    plt.xlabel('Numer epoki', fontsize=14)
+    plt.ylabel('Błąd średniokwadratowy', fontsize=14)
     plt.grid(True)
-    plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym')
-    plt.legend()
+    plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze treninigowym', fontsize=16)
+    plt.legend(fontsize=12)
     plt.show()
 
 def plot_2(histories, testing_data):
@@ -171,18 +170,18 @@ def plot_2(histories, testing_data):
         plt.plot(history.history['mse'], label='l. warstw: {}'.format(counter))
         counter += 1
     plt.axhline(y=test_mse, color='b', linestyle='--', label='blad zbioru testowego')
-    plt.xlabel('Numer epoki')
-    plt.ylabel('Błąd średniokwadratowy')
-    # plt.yscale('log')
+    plt.xlabel('Numer epoki', fontsize=14)
+    plt.ylabel('Błąd średniokwadratowy', fontsize=14)
     plt.grid(True)
-    plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym')
-    plt.legend()
+    plt.title('Wartość błędu średniokwadratowego dla każdej epoki na zbiorze testowym', fontsize=16)
+    plt.legend(fontsize=12)
     plt.show()
-# plot 3
+
 def calculate_cdf(errors):
     sorted_errors = np.sort(errors)
     cdf = np.arange(1, len(sorted_errors) + 1) / len(sorted_errors)
     return sorted_errors, cdf
+
 def plot_3(models, testing_data):
     plt.figure(figsize=(10, 6))
     counter = 1
@@ -203,13 +202,12 @@ def plot_3(models, testing_data):
     sorted_real_errors, real_cdf = calculate_cdf(real_errors)
     plt.plot(sorted_real_errors, real_cdf, label='dystrybuanta pomiarów dynamicznych', linestyle='--')
 
-    plt.xlabel('Błąd [mm]')
-    plt.ylabel('Prawdopodobieństwo')
-    plt.title('Dystrybuanta blędów pomiarów dynamicznych dla wybranych wariantów sieci')
-    plt.legend()
+    plt.xlabel('Błąd [mm]', fontsize=14)
+    plt.ylabel('Prawdopodobieństwo', fontsize=14)
+    plt.title('Dystrybuanta błędów pomiarów dynamicznych dla wybranych wariantów sieci', fontsize=16)
+    plt.legend(fontsize=12)
     plt.show()
 
-# plot 4
 def plot_4(models, testing_data):
     plt.figure(figsize=(10, 6))
 
@@ -235,7 +233,6 @@ def plot_4(models, testing_data):
         corrected_x.append(val[0])
         corrected_y.append(val[1])
 
-
     # measured values
     measured_x = testing_data["input_X"].values
     measured_y = testing_data["input_Y"].values
@@ -244,12 +241,10 @@ def plot_4(models, testing_data):
     plt.scatter(corrected_x, corrected_y, label='poprawione wartości', color='green', alpha=1.0)
     plt.scatter(real_x, real_y, label='wartości rzeczywiste', color='red', alpha=0.7)
 
-
-
-    plt.xlabel('x [mm]')
-    plt.ylabel('y [mm]')
-    plt.title('Wykres wyników pomiarów dynamicznych dla wariantu o największej skuteczności')
-    plt.legend()
+    plt.xlabel('x [mm]', fontsize=14)
+    plt.ylabel('y [mm]', fontsize=14)
+    plt.title('Wykres wyników pomiarów dynamicznych dla wariantu o największej skuteczności', fontsize=16)
+    plt.legend(fontsize=12)
     print(model.get_id())
     plt.show()
 
